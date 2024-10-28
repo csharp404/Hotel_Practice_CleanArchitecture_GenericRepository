@@ -21,17 +21,38 @@ public class GenericRepository<T>(AppDbContext context):IGenericRepository<T> wh
 
     public async Task<T> DeleteById(int id)
     {
-        var data = await context.Set<T>().FindAsync(id);
-        context.Set<T>().Remove(data);
-       await context.Save();
-       return data;
+        var trans = context.getTransaction();
+        try
+        {
+            var data = await context.Set<T>().FindAsync(id);
+            context.Set<T>().Remove(data);
+            await context.Save();
+            trans.Commit();
+            return data;
+        }
+        catch (Exception)
+        {
+            trans.Rollback();
+            throw;
+        }
     }
 
     public async Task<T> Update(T entity)
     {
-        context.Set<T>().Update(entity);
-        await context.Save();
-        return entity;
+        var trans = context.getTransaction();
+
+        try
+        {
+            context.Set<T>().Update(entity);
+            await context.Save();
+            trans.Commit();
+            return entity;
+        }
+        catch (Exception)
+        {
+            trans.Rollback();
+            throw;
+        }
     }
 
     public async Task<T> Create(T entity)

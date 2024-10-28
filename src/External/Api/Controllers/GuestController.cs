@@ -12,6 +12,7 @@ namespace Api.Controllers;
     {
         [HttpGet]
         [Route("GetAllGuests")]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var data = await services.GetAll();

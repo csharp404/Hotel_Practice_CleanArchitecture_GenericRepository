@@ -28,16 +28,17 @@ builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddAuthentication(x =>
 {
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x=> new TokenValidationParameters()
+}).AddJwtBearer(x=> x.TokenValidationParameters = new()
 {
     ValidIssuer = "Us",
     ValidAudience = "Us",
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWTsecret").Value)),
     ValidateIssuerSigningKey = true
 });
+
 /*var config = TypeAdapterConfig.GlobalSettings;
 config.Scan(typeof(ToDoItemMapping).Assembly);*/
 var app = builder.Build();

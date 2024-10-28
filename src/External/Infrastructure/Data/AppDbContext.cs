@@ -3,13 +3,15 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options):IdentityDbContext<IdentityUser>(options) , IAppDbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<IdentityUser>(options), IAppDbContext
 {
     public DbSet<Room> Rooms { get; set; }
     public DbSet<Guest> Guests { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
@@ -18,6 +20,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options):IdentityDbCont
 
     public async Task Save()
     {
-       await SaveChangesAsync();
+        await SaveChangesAsync();
+    }
+
+    public IDbContextTransaction getTransaction()
+    {
+         return Database.BeginTransaction();
     }
 }
+
+   
